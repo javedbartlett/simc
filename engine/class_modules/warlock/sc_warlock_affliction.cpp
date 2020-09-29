@@ -120,6 +120,8 @@ struct shadow_bolt_t : public affliction_spell_t
     if ( time_to_execute == 0_ms && p()->buffs.nightfall->check() )
       m *= 1.0 + p()->buffs.nightfall->default_value;
 
+    m *= 1 + p()->buffs.decimating_bolt->check_value();
+
     return m;
   }
 
@@ -132,7 +134,13 @@ struct shadow_bolt_t : public affliction_spell_t
   {
     affliction_spell_t::execute();
     if ( time_to_execute == 0_ms )
+<<<<<<< HEAD
       p()->buffs.nightfall->decrement();
+=======
+      p()->buffs.nightfall->expire();
+
+    p()->buffs.decimating_bolt->decrement();
+>>>>>>> add_decimating_bolt
   }
 };
 
@@ -633,6 +641,15 @@ struct drain_soul_t : public affliction_spell_t
     hasted_ticks = may_crit = true;
   }
 
+  void execute() override
+  {
+    dot_t* dot = get_dot( target );
+    if ( dot->is_ticking() )
+      p()->buffs.decimating_bolt->decrement();
+
+    affliction_spell_t::execute();
+  }
+
   void tick( dot_t* d ) override
   {
     affliction_spell_t::tick( d );
@@ -650,8 +667,17 @@ struct drain_soul_t : public affliction_spell_t
     if ( t->health_percentage() < p()->talents.drain_soul->effectN( 3 ).base_value() )
       m *= 1.0 + p()->talents.drain_soul->effectN( 2 ).percent();
 
+    m *= 1 + p()->buffs.decimating_bolt->check_value();
+
     return m;
   }
+
+  void last_tick( dot_t* d ) override
+  {
+    affliction_spell_t::last_tick( d );
+    p()->buffs.decimating_bolt->decrement();
+  }
+
 };
 
 struct haunt_t : public affliction_spell_t
