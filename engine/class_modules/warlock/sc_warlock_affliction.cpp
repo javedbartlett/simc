@@ -237,7 +237,10 @@ struct agony_t : public affliction_spell_t
     }
 
     if ( p()->legendary.perpetual_agony_of_azjaqir->ok() )
+    {
       increment_max *= 1.0 + p()->legendary.perpetual_agony_of_azjaqir->effectN( 1 ).percent();
+    }
+
 
     p()->agony_accumulator += rng().range( 0.0, increment_max );
 
@@ -592,8 +595,13 @@ struct malefic_rapture_t : public affliction_spell_t
         if ( td->dots_phantom_singularity->is_ticking() )
           mult += 1.0;
 
+        if ( td->dots_siphon_life->is_ticking() )
+          mult += 1.0;
+
+        if ( td->dots_scouring_tithe->is_ticking() )
+          mult += 1.0;
+
         // TODO:
-        // Scouring Tithe - awaiting merge
         // Impending catastrophe
         // Soul Rot
         return mult;
@@ -603,6 +611,10 @@ struct malefic_rapture_t : public affliction_spell_t
       {
         double m = affliction_spell_t::composite_da_multiplier( s );
         m *= get_dots_ticking( s->target );
+
+        if ( td( s->target )->dots_unstable_affliction->is_ticking() )
+          m *= 1 + p()->conduit.focused_malignancy.percent();
+
         return m;
       }
 
@@ -953,13 +965,13 @@ void warlock_t::init_spells_affliction()
 
   // Legendaries
   legendary.malefic_wrath              = find_runeforge_legendary( "Malefic Wrath" );
-  legendary.perpetual_agony_of_azjaqir = find_runeforge_legendary( "Perpetual Agony of Ajz'Aqir" );
+  legendary.perpetual_agony_of_azjaqir = find_runeforge_legendary( "Perpetual Agony of Azj'Aqir" );
   legendary.wrath_of_consumption       = find_runeforge_legendary( "Wrath of Consumption" );
 
   // Conduits
   conduit.cold_embrace       = find_conduit_spell( "Cold Embrace" );
   conduit.corrupting_leer    = find_conduit_spell( "Corrupting Leer" );
-  conduit.focused_malignancy = find_conduit_spell( "Focused Malginancy" );
+  conduit.focused_malignancy = find_conduit_spell( "Focused Malignancy" );
   conduit.rolling_agony      = find_conduit_spell( "Rolling Agony" );
 
   // Actives

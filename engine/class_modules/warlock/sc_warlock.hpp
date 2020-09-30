@@ -478,6 +478,8 @@ public:
     propagate_const<buff_t*> madness_of_the_azjaqir;
     propagate_const<buff_t*> balespiders_burning_core;
     propagate_const<buff_t*> malefic_wrath;
+    propagate_const<buff_t*> perpetual_agony_of_azjaqir;
+
   } buffs;
 
   //TODO: SL Beta - Some of these gains are unused, should they be pruned?
