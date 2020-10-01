@@ -24,11 +24,10 @@ struct drain_life_t : public warlock_spell_t
 
     std::vector<player_t*>& target_list() const override
   {
-      sim->out_log.printf( "We are inside vector" );
       if ( p()->buffs.soul_rot->check() )
     {
       target_cache.list = warlock_spell_t::target_list();
-      sim->out_log.printf( "We are inside target list" );
+
       size_t i = target_cache.list.size();
       while ( i > 0 )
       {
@@ -47,11 +46,10 @@ struct drain_life_t : public warlock_spell_t
   
     int n_targets() const override
   {
-      sim->out_log.printf( "We are before n_targets if statement" );
       if ( p()->buffs.soul_rot && p()->buffs.soul_rot->check() )
     {
       assert( warlock_spell_t::n_targets() == 0 );
-      sim->out_log.printf( "We are inside n_targets" );
+
       return -1;
     }
     else
