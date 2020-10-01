@@ -27,6 +27,12 @@ struct drain_life_t : public warlock_spell_t
       if ( p()->buffs.soul_rot->check() )
     {
       target_cache.list = warlock_spell_t::target_list();
+      // TODO
+      // we need to force the primary target to be in the list
+      // it's not currently doing that and if for some reason our primary target didn't have soul rot
+      // it wouldn't target it with drain life but it would aoe the other targets
+      // which is obviously not right, it should still hit the primary cuz it's a single target spell
+      // this might be as simple as stopping the target list erasure a step earlier than it is now
 
       size_t i = target_cache.list.size();
       while ( i > 0 )
