@@ -22,6 +22,42 @@ struct drain_life_t : public warlock_spell_t
     may_crit     = false;
   }
 
+  //  std::vector<player_t*>& target_list() const override
+  //{
+  //    sim->out_log.printf( "We are inside vector" );
+  //    if ( p()->buffs.soul_rot->check() )
+  //  {
+  //    target_cache.list = warlock_spell_t::target_list();
+  //    sim->out_log.printf( "We are inside target list" );
+  //    size_t i = target_cache.list.size();
+  //    while ( i > 0 )
+  //    {
+  //      i--;
+  //      player_t* current_target = target_cache.list[ i ];
+
+  //      auto td = this->td( current_target );
+  //      if ( !td->dots_soul_rot->is_ticking() )
+  //        target_cache.list.erase( target_cache.list.begin() + i );
+  //    }
+  //    return target_cache.list;
+  //  }
+  //  else
+  //    return warlock_spell_t::target_list();
+  //}
+  //
+  //  int n_targets() const override
+  //{
+  //    sim->out_log.printf( "We are before n_targets if statement" );
+  //    if ( p()->buffs.soul_rot && p()->buffs.soul_rot->check() )
+  //  {
+  //    assert( warlock_spell_t::n_targets() == 0 );
+  //    sim->out_log.printf( "We are inside n_targets" );
+  //    return -1;
+  //  }
+  //  else
+  //    return warlock_spell_t::n_targets();
+  //}
+
   void execute() override
   {
     if ( p()->talents.inevitable_demise->ok() && p()->buffs.inevitable_demise->check() > 0 )
@@ -29,6 +65,11 @@ struct drain_life_t : public warlock_spell_t
       if ( p()->buffs.drain_life->check() )
         p()->buffs.inevitable_demise->expire();
     }
+
+    // Need to invalidate the target cache to figure out soul rot targets.
+    //target_cache.is_valid = false;
+
+    //const auto& targets = target_list();
 
     warlock_spell_t::execute();
 
@@ -99,6 +140,13 @@ struct soul_rot_t : public warlock_spell_t
 
     return pm;
   }
+
+  void execute() override
+  {
+    p()->buffs.soul_rot->trigger();
+    warlock_spell_t::execute();
+  }
+
 };
 
 struct decimating_bolt_dmg_t : public warlock_spell_t
@@ -668,6 +716,9 @@ void warlock_t::create_buffs()
       make_buff( this, "decimating_bolt", find_spell( 325299 ) )->set_duration( find_spell( 325299 )->duration() )
                               ->set_default_value(4)
                               ->set_max_stack( talents.drain_soul->ok() ? 1 : 3 );
+
+  //buffs.soul_rot = make_buff( this, "soul_rot" )->set_max_stack( 1 )->set_duration( find_spell( 325640 )->duration() );
+  buffs.soul_rot = make_buff( this, "soul_rot" )->set_max_stack( 1 )->set_duration( covenant.soul_rot->duration() );
 }
 
 void warlock_t::init_spells()
