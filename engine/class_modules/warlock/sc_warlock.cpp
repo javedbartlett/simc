@@ -22,54 +22,54 @@ struct drain_life_t : public warlock_spell_t
     may_crit     = false;
   }
 
-  //  std::vector<player_t*>& target_list() const override
-  //{
-  //    sim->out_log.printf( "We are inside vector" );
-  //    if ( p()->buffs.soul_rot->check() )
-  //  {
-  //    target_cache.list = warlock_spell_t::target_list();
-  //    sim->out_log.printf( "We are inside target list" );
-  //    size_t i = target_cache.list.size();
-  //    while ( i > 0 )
-  //    {
-  //      i--;
-  //      player_t* current_target = target_cache.list[ i ];
+    std::vector<player_t*>& target_list() const override
+  {
+      sim->out_log.printf( "We are inside vector" );
+      if ( p()->buffs.soul_rot->check() )
+    {
+      target_cache.list = warlock_spell_t::target_list();
+      sim->out_log.printf( "We are inside target list" );
+      size_t i = target_cache.list.size();
+      while ( i > 0 )
+      {
+        i--;
+        player_t* current_target = target_cache.list[ i ];
 
-  //      auto td = this->td( current_target );
-  //      if ( !td->dots_soul_rot->is_ticking() )
-  //        target_cache.list.erase( target_cache.list.begin() + i );
-  //    }
-  //    return target_cache.list;
-  //  }
-  //  else
-  //    return warlock_spell_t::target_list();
-  //}
-  //
-  //  int n_targets() const override
-  //{
-  //    sim->out_log.printf( "We are before n_targets if statement" );
-  //    if ( p()->buffs.soul_rot && p()->buffs.soul_rot->check() )
-  //  {
-  //    assert( warlock_spell_t::n_targets() == 0 );
-  //    sim->out_log.printf( "We are inside n_targets" );
-  //    return -1;
-  //  }
-  //  else
-  //    return warlock_spell_t::n_targets();
-  //}
+        auto td = this->td( current_target );
+        if ( !td->dots_soul_rot->is_ticking() )
+          target_cache.list.erase( target_cache.list.begin() + i );
+      }
+      return target_cache.list;
+    }
+    else
+      return warlock_spell_t::target_list();
+  }
+  
+    int n_targets() const override
+  {
+      sim->out_log.printf( "We are before n_targets if statement" );
+      if ( p()->buffs.soul_rot && p()->buffs.soul_rot->check() )
+    {
+      assert( warlock_spell_t::n_targets() == 0 );
+      sim->out_log.printf( "We are inside n_targets" );
+      return -1;
+    }
+    else
+      return warlock_spell_t::n_targets();
+  }
 
   void execute() override
   {
-    if ( p()->talents.inevitable_demise->ok() && p()->buffs.inevitable_demise->check() > 0 )
+    if ( p()->buffs.inevitable_demise->check() > 0 )
     {
       if ( p()->buffs.drain_life->check() )
         p()->buffs.inevitable_demise->expire();
     }
 
     // Need to invalidate the target cache to figure out soul rot targets.
-    //target_cache.is_valid = false;
+    target_cache.is_valid = false;
 
-    //const auto& targets = target_list();
+    const auto& targets = target_list();
 
     warlock_spell_t::execute();
 
